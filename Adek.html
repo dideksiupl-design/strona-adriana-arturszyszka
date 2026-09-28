@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>STRONA ADRIANA</title>
+    <style>
+        body {
+            background-color: #0b0c10;
+            font-family: 'Poppins', 'Arial Black', sans-serif;
+            color: #ffffff;
+            margin: 0;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            cursor: pointer;
+        }
+
+        /* Wielki, pulsujący napis startowy na środku */
+        .ekran-startowy {
+            font-size: 3rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            text-align: center;
+            background: linear-gradient(45deg, #ff007f, #00f0ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(255, 0, 127, 0.7);
+            z-index: 10;
+            transition: opacity 0.4s ease;
+        }
+
+        /* Styl dla bardzo szybkich, latających obrazków */
+        .latajace-zdjecie {
+            position: absolute;
+            width: 140px; 
+            height: 140px; 
+            border: 3px solid #ff007f;
+            box-shadow: 0 0 20px #ff007f;
+            border-radius: 10px;
+            object-fit: cover;
+            z-index: 5;
+        }
+
+        /* Osobna ramka na stałe zdjęcie nad linkiem */
+        .ramka-na-zdjecie {
+            position: absolute;
+            bottom: 185px; 
+            z-index: 20;
+            background: rgba(11, 12, 16, 0.9);
+            padding: 10px; 
+            border-radius: 12px;
+            border: 2px solid #ff007f; 
+            box-shadow: 0 0 20px rgba(255, 0, 127, 0.5);
+            display: none; /* Ukryte przed kliknięciem */
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Klasa aktywująca animację pojawienia się */
+        .pokaz-ramke {
+            display: flex !important;
+            animation: wjazdZdjecia 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        /* Animacja: zdjęcie rośnie i obraca się */
+        @keyframes wjazdZdjecia {
+            0% {
+                transform: scale(0) rotate(-180deg);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1) rotate(0deg);
+                opacity: 1;
+            }
+        }
+
+        /* Stałe zdjęcie w ramce */
+        .stale-zdjecie {
+            width: 160px; 
+            height: 110px; 
+            object-fit: cover;
+            border-radius: 6px;
+        }
+
+        /* Stały panel z linkami na samym dole ekranu */
+        .dolny-panel {
+            position: absolute;
+            bottom: 30px;
+            z-index: 20;
+            text-align: center;
+            background: rgba(11, 12, 16, 0.9);
+            padding: 15px 30px;
+            border-radius: 15px;
+            border: 2px solid #00f0ff;
+            box-shadow: 0 0 25px rgba(0, 240, 255, 0.4);
+            pointer-events: auto;
+        }
+
+        /* Napis Artur Szyszka będący linkiem do TikToka */
+        .tiktok-link {
+            display: inline-block;
+            font-size: 1.8rem;
+            color: #00f0ff;
+            text-decoration: none;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+            transition: all 0.3s ease;
+            text-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+        }
+
+        .tiktok-link:hover {
+            color: #ff007f;
+            text-shadow: 0 0 20px #ff007f;
+            transform: scale(1.05);
+        }
+
+        /* Tekst dolny dla Adiego */
+        .tekst-adi {
+            font-size: 1.2rem;
+            color: #ffffff;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            margin: 0;
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ekran-startowy" id="start-btn">
+        KLIKNIJ GDZIEKOLWIEK,<br>ABY ODPALIĆ MUZYKE ADRIANA! 🔊
+    </div>
+
+    <!-- Odtwarzacz audio w tle -->
+    <audio id="muzyka-tle" loop>
+        <source src="piosenka.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- Jedno stałe zdjęcie nad linkiem (pozostaje na swoim miejscu) -->
+    <div class="ramka-na-zdjecie" id="ramka-foto">
+        <img src="Zdjęcie nad linkiem.jpg" alt="Zdjęcie nad linkiem.jpg" class="Zdjęcie nad linkiem.jpg">
+    </div>
+
+    <!-- Panel dolny z napisami -->
+    <div class="dolny-panel">
+        <a href="https://tiktok.com" target="_blank" class="tiktok-link">Artur Szyszka</a>
+        <p class="tekst-adi">Adi nie obraź sie Okpaserniczanka?</p>
+    </div>
+
+    <script>
+        const audio = document.getElementById('muzyka-tle');
+        const startBtn = document.getElementById('start-btn');
+        const ramkaFoto = document.getElementById('ramka-foto');
+        let czyGra = false;
+
+        document.body.addEventListener('click', (e) => {
+            if (e.target.tagName === 'A' || e.target.classList.contains('stale-zdjecie')) return;
+
+            if (!czyGra) {
+                audio.volume = 1.0; 
+                audio.play().catch(err => console.log("Blokada audio:", err));
+                
+                startBtn.style.opacity = '0';
+                setTimeout(() => startBtn.remove(), 400);
+                czyGra = true;
+
+                // Animowane pokazanie stałego zdjęcia
+                ramkaFoto.classList.add('pokaz-ramke');
+
+                // Uruchomienie ograniczonej liczby latających zdjęć
+                stworzZdjecia();
+            }
+        });
+
+        window.addEventListener('beforeunload', (e) => {
+            e.preventDefault();
+            e.returnValue = 'Nie możesz wyjść!';
+        });
+
+        /* ZMNIEJSZONA ILOŚĆ: Dokładnie 9 latających elementów */
+        const plikiZdjec = [
+            'zdjecie1.jpg', 'zdjecie2.jpg', 'zdjecie3.jpg', 
+            'zdjecie4.jpg', 'zdjecie5.jpg', 'zdjecie6.jpg', 
+            'zdjecie7.jpg', 'zdjecie8.jpg', 'zdjecie9.jpg'
+        ];
+        const listaObrazkow = [];
+
+        function stworzZdjecia() {
+            plikiZdjec.forEach((plik) => {
+                const img = document.createElement('img');
+                img.src = plik;
+                img.className = 'latajace-zdjecie';
+                
+                let x = Math.random() * (window.innerWidth - 140);
+                let y = Math.random() * (window.innerHeight - 140);
+                
+                let dx = (Math.random() - 0.5) * 24;
+                let dy = (Math.random() - 0.5) * 24;
+
+                if (Math.abs(dx) < 5) dx = dx < 0 ? -10 : 10;
+                if (Math.abs(dy) < 5) dy = dy < 0 ? -10 : 10;
+
+                img.style.left = x + 'px';
+                img.style.top = y + 'px';
+                document.body.appendChild(img);
+
+                listaObrazkow.push({ element: img, x, y, dx, dy });
+            });
+
+            requestAnimationFrame(animuj);
+        }
+
+        function animuj() {
+            listaObrazkow.forEach((foto) => {
+                foto.x += foto.dx;
+                foto.y += foto.dy;
+
+                if (foto.x <= 0 || foto.x >= window.innerWidth - 140) {
+                    foto.dx *= -1;
+                }
+                if (foto.y <= 0 || foto.y >= window.innerHeight - 140) {
+                    foto.dy *= -1;
+                }
+
+                foto.element.style.left = foto.x + 'px';
+                foto.element.style.top = foto.y + 'px';
+            });
+
+            requestAnimationFrame(animuj);
+        }
+    </script>
+
+</body>
+</html>
